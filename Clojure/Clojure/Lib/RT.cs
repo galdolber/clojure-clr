@@ -42,8 +42,63 @@ namespace clojure.lang
 
         static Dictionary<Symbol,Type> CreateDefaultImportDictionary()
         {
-            var q = GetAllTypesInNamespace("System");
-            var d = q.ToDictionary(keySelector: t => Symbol.intern(t.Name));
+            var d = new Dictionary<Symbol, Type>();
+
+            d.Add(Symbol.intern("String"), typeof(String));
+            d.Add(Symbol.intern("Exception"), typeof(Exception));
+            d.Add(Symbol.intern("StackOverflowException"), typeof(StackOverflowException));
+            d.Add(Symbol.intern("OutOfMemoryException"), typeof(OutOfMemoryException));
+            d.Add(Symbol.intern("DateTime"), typeof(DateTime));
+            d.Add(Symbol.intern("StringComparer"), typeof(StringComparer));
+            d.Add(Symbol.intern("AggregateException"), typeof(AggregateException));
+            d.Add(Symbol.intern("AppContext"), typeof(AppContext));
+            d.Add(Symbol.intern("Object"), typeof(Object));
+            d.Add(Symbol.intern("Action"), typeof(Action));
+            d.Add(Symbol.intern("Array"), typeof(Array));
+            d.Add(Symbol.intern("Tuple"), typeof(Tuple));
+            d.Add(Symbol.intern("IComparable"), typeof(IComparable));
+
+            d.Add(Symbol.intern("Char"), typeof(Char));
+            d.Add(Symbol.intern("Buffer"), typeof(Buffer));
+            d.Add(Symbol.intern("BitConverter"), typeof(BitConverter));
+            d.Add(Symbol.intern("Boolean"), typeof(Boolean));
+            d.Add(Symbol.intern("CharEnumerator"), typeof(CharEnumerator));
+            d.Add(Symbol.intern("Byte"), typeof(Byte));
+            d.Add(Symbol.intern("Decimal"), typeof(Decimal));
+            d.Add(Symbol.intern("Console"), typeof(Console));
+
+            d.Add(Symbol.intern("Int16"), typeof(Int16));
+            d.Add(Symbol.intern("Int32"), typeof(Int32));
+            d.Add(Symbol.intern("Int64"), typeof(Int64));
+            d.Add(Symbol.intern("IntPtr"), typeof(IntPtr));
+            d.Add(Symbol.intern("Math"), typeof(Math));
+            d.Add(Symbol.intern("Random"), typeof(Random));
+            d.Add(Symbol.intern("UInt16"), typeof(UInt16));
+            d.Add(Symbol.intern("UInt32"), typeof(UInt32));
+            d.Add(Symbol.intern("UInt64"), typeof(UInt64));
+            d.Add(Symbol.intern("UIntPtr"), typeof(UIntPtr));
+            d.Add(Symbol.intern("Nullable"), typeof(Nullable));
+
+            d.Add(Symbol.intern("Double"), typeof(Double));
+            d.Add(Symbol.intern("Enum"), typeof(Enum));
+            d.Add(Symbol.intern("Convert"), typeof(Convert));
+            d.Add(Symbol.intern("Environment"), typeof(Environment));
+            d.Add(Symbol.intern("SByte"), typeof(SByte));
+            d.Add(Symbol.intern("Type"), typeof(Type));
+            d.Add(Symbol.intern("Single"), typeof(Single));
+
+            d.Add(Symbol.intern("ArgumentException"), typeof(ArgumentException));
+            d.Add(Symbol.intern("InvalidCastException"), typeof(InvalidCastException));
+            d.Add(Symbol.intern("InvalidOperationException"), typeof(InvalidOperationException));
+            d.Add(Symbol.intern("NotImplementedException"), typeof(NotImplementedException));
+            d.Add(Symbol.intern("ValueType"), typeof(ValueType));
+            d.Add(Symbol.intern("InvalidProgramException"), typeof(InvalidProgramException));
+            d.Add(Symbol.intern("IndexOutOfRangeException"), typeof(IndexOutOfRangeException));
+            d.Add(Symbol.intern("DateTimeOffset"), typeof(DateTimeOffset));
+            d.Add(Symbol.intern("TimeSpan"), typeof(TimeSpan));
+            d.Add(Symbol.intern("IDisposable"), typeof(IDisposable));
+            d.Add(Symbol.intern("FormatException"), typeof(FormatException));
+            d.Add(Symbol.intern("OverflowException"), typeof(OverflowException));
 
             // ADDED THESE TO SUPPORT THE BOOTSTRAPPING IN THE JAVA CORE.CLJ
             d.Add(Symbol.intern("StringBuilder"), typeof(StringBuilder));
@@ -52,21 +107,6 @@ namespace clojure.lang
 
             return d;
         }
-
-        static IEnumerable<Type> GetAllTypesInNamespace(string nspace)
-        {
-            var q = AppDomain.CurrentDomain.GetAssemblies()
-                       .SelectMany(t => t.GetTypes())
-                       .Where(t => (t.IsClass || t.IsInterface || t.IsValueType) &&
-                                    t.Namespace == nspace &&
-                                    t.IsPublic &&
-                                    !t.IsGenericTypeDefinition &&
-                                    !t.Name.StartsWith("_") &&
-                                    !t.Name.StartsWith("<"));
-           
-            return q; 
-        }
-
      
         #endregion
 
