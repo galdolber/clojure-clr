@@ -107,6 +107,21 @@ namespace clojure.lang
 
             return d;
         }
+
+        static IEnumerable<Type> GetAllTypesInNamespace(string nspace)
+        {
+            var q = AppDomain.CurrentDomain.GetAssemblies()
+                       .SelectMany(t => t.GetTypes())
+                       .Where(t => (t.IsClass || t.IsInterface || t.IsValueType) &&
+                                    t.Namespace == nspace &&
+                                    t.IsPublic &&
+                                    !t.IsGenericTypeDefinition &&
+                                    !t.Name.StartsWith("_") &&
+                                    !t.Name.StartsWith("<"));
+           
+            return q; 
+        }
+
      
         #endregion
 
