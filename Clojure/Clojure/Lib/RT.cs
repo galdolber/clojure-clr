@@ -40,7 +40,7 @@ namespace clojure.lang
         //simple-symbol->class
         public static readonly IPersistentMap DefaultImports = PersistentHashMap.create((IDictionary)CreateDefaultImportDictionary());
 
-        static Dictionary<Symbol,Type> CreateDefaultImportDictionary()
+        static Dictionary<Symbol, Type> CreateDefaultImportDictionary()
         {
             var d = new Dictionary<Symbol, Type>();
 
@@ -110,19 +110,22 @@ namespace clojure.lang
 
         static IEnumerable<Type> GetAllTypesInNamespace(string nspace)
         {
+            Func<Assembly, IEnumerable<Type>> getTypes = (Assembly a) => {
+                try { return a.GetTypes(); } catch (Exception) { return new Type[0]; }
+            };
             var q = AppDomain.CurrentDomain.GetAssemblies()
-                       .SelectMany(t => t.GetTypes())
+                       .SelectMany(t => getTypes(t))
                        .Where(t => (t.IsClass || t.IsInterface || t.IsValueType) &&
                                     t.Namespace == nspace &&
                                     t.IsPublic &&
                                     !t.IsGenericTypeDefinition &&
                                     !t.Name.StartsWith("_") &&
                                     !t.Name.StartsWith("<"));
-           
-            return q; 
+
+            return q;
         }
 
-     
+
         #endregion
 
         #region Some misc. goodies
@@ -168,14 +171,14 @@ namespace clojure.lang
         #region Predefined namespaces
 
         // We need this initialization to happen earlier than most of the Var inits.
-        public static readonly Namespace ClojureNamespace 
+        public static readonly Namespace ClojureNamespace
             = Namespace.findOrCreate(Symbol.intern("clojure.core"));
 
         #endregion
 
         #region Useful Keywords
 
-        public static readonly Keyword TagKey 
+        public static readonly Keyword TagKey
             = Keyword.intern(null, "tag");
 
         public static readonly Keyword ConstKey
@@ -184,7 +187,7 @@ namespace clojure.lang
         public static readonly Keyword EvalFileKey
             = Keyword.intern("clojure.core", "eval-file");
 
-        public static readonly Keyword LineKey 
+        public static readonly Keyword LineKey
             = Keyword.intern(null, "line");
 
         public static readonly Keyword ColumnKey
@@ -204,7 +207,7 @@ namespace clojure.lang
 
         public static readonly Keyword EndLineKey
             = Keyword.intern(null, "end-line");
-        
+
         public static readonly Keyword EndColumnKey
             = Keyword.intern(null, "end-column");
 
@@ -226,7 +229,7 @@ namespace clojure.lang
             //= Var.intern(CLOJURE_NS, Symbol.intern("in-ns"), RT.F);
             = Var.intern(ClojureNamespace, Symbol.intern("in-ns"), false);
 
-        public static readonly Var NSVar 
+        public static readonly Var NSVar
             //= Var.intern(CLOJURE_NS, Symbol.intern("ns"), RT.F);
             = Var.intern(ClojureNamespace, Symbol.intern("ns"), false);
 
@@ -234,9 +237,9 @@ namespace clojure.lang
 
         #region Vars (I/O-related)
 
-        public static readonly Var OutVar 
+        public static readonly Var OutVar
             = Var.intern(ClojureNamespace, Symbol.intern("*out*"), new StreamWriter(System.Console.OpenStandardOutput())).setDynamic();
-        
+
         public static readonly Var ErrVar
             = Var.intern(ClojureNamespace, Symbol.intern("*err*"), new StreamWriter(System.Console.OpenStandardError())).setDynamic();
 
@@ -247,12 +250,12 @@ namespace clojure.lang
         static readonly Var PrintReadablyVar
             //= Var.intern(CLOJURE_NS, Symbol.intern("*print-readably*"), RT.T);
             = Var.intern(ClojureNamespace, Symbol.intern("*print-readably*"), true).setDynamic();
-        
-        public static readonly Var PrintMetaVar 
+
+        public static readonly Var PrintMetaVar
             //= Var.intern(CLOJURE_NS, Symbol.intern("*print-meta*"), RT.F);
             = Var.intern(ClojureNamespace, Symbol.intern("*print-meta*"), false).setDynamic();
-        
-        public static readonly Var PrintDupVar 
+
+        public static readonly Var PrintDupVar
             //= Var.intern(CLOJURE_NS, Symbol.intern("*print-dup*"), RT.F);
             = Var.intern(ClojureNamespace, Symbol.intern("*print-dup*"), false).setDynamic();
 
@@ -261,10 +264,10 @@ namespace clojure.lang
             //= Var.intern(CLOJURE_NS, Symbol.intern("*flush-on-newline*"), RT.T);
             = Var.intern(ClojureNamespace, Symbol.intern("*flush-on-newline*"), true).setDynamic();
 
-        static readonly Var PrintInitializedVar 
+        static readonly Var PrintInitializedVar
             = Var.intern(ClojureNamespace, Symbol.intern("print-initialized")).setDynamic();
-        
-        static readonly Var PrOnVar 
+
+        static readonly Var PrOnVar
             = Var.intern(ClojureNamespace, Symbol.intern("pr-on"));
 
         public static readonly Var AllowSymbolEscapeVar
@@ -284,20 +287,20 @@ namespace clojure.lang
         public static readonly Var WarnOnReflectionVar
             //= Var.intern(CLOJURE_NS, Symbol.intern("*warn-on-reflection*"), RT.F);
             = Var.intern(ClojureNamespace, Symbol.intern("*warn-on-reflection*"), false).setDynamic();
- 
+
         //public static readonly Var MACRO_META 
         //    = Var.intern(CLOJURE_NS, Symbol.intern("*macro-meta*"), null);
 
         public static readonly Var MathContextVar
             = Var.intern(ClojureNamespace, Symbol.intern("*math-context*"), null).setDynamic();
-        
+
         public static readonly Var AgentVar
             = Var.intern(ClojureNamespace, Symbol.intern("*agent*"), null).setDynamic();
 
         static readonly Object _readeval = ReadTrueFalseUnknown(Environment.GetEnvironmentVariable("CLOJURE_READ_EVAL") ?? Environment.GetEnvironmentVariable("clojure.read.eval") ?? "true");
-            
+
         public static readonly Var ReadEvalVar
-            = Var.intern(ClojureNamespace, Symbol.intern("*read-eval*"),_readeval).setDynamic();
+            = Var.intern(ClojureNamespace, Symbol.intern("*read-eval*"), _readeval).setDynamic();
 
         public static readonly Var DataReadersVar
             = Var.intern(ClojureNamespace, Symbol.intern("*data-readers*"), RT.map()).setDynamic();
@@ -308,7 +311,7 @@ namespace clojure.lang
         public static readonly Var DefaultDataReadersVar
            = Var.intern(ClojureNamespace, Symbol.intern("default-data-readers"), RT.map());
 
-        public static readonly Var SuppressReadVar 
+        public static readonly Var SuppressReadVar
             = Var.intern(ClojureNamespace, Symbol.intern("*suppress-read*"), null).setDynamic();
 
         public static readonly Var AssertVar
@@ -412,7 +415,7 @@ namespace clojure.lang
 #else
         public static bool instrumentMacros = !ReadTrueFalseDefault(Environment.GetEnvironmentVariable("clojure.spec.skip-macros"), false);
 #endif
-        
+
         internal static volatile bool CHECK_SPECS = false;
 
         static RT()
@@ -434,7 +437,7 @@ namespace clojure.lang
             env.GetEngine("clj");
 
 
-            _versionProperties.LoadFromString(clojure.lang.Properties.Resources.version); 
+            _versionProperties.LoadFromString(clojure.lang.Properties.Resources.version);
 
             Keyword arglistskw = Keyword.intern(null, "arglists");
             Symbol namesym = Symbol.intern("name");
@@ -486,7 +489,7 @@ namespace clojure.lang
                 // this is okay.  It just means that the assets clojure/core.clj and company are going to be somewhere else
             }
 
-            if ( RuntimeBootstrapFlag._doRTBootstrap )
+            if (RuntimeBootstrapFlag._doRTBootstrap)
                 load("clojure/core");
         }
 
@@ -523,7 +526,7 @@ namespace clojure.lang
 
             // load spec
             {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 Assembly.LoadFile(Path.Combine(baseDir, "clojure.spec.alpha.dll"));
                 Assembly.LoadFile(Path.Combine(baseDir, "clojure.core.specs.alpha.dll"));
@@ -549,6 +552,8 @@ namespace clojure.lang
                 Var refer = var("clojure.core", "refer");
                 in_ns.invoke(USER);
                 refer.invoke(CLOJURE);
+                MaybeLoadCljScript("user.cljr");
+                MaybeLoadCljScript("user.cljc");
                 MaybeLoadCljScript("user.clj");
 
                 // start socket servers
@@ -610,7 +615,7 @@ namespace clojure.lang
         #region Collections support
 
         private const int CHUNK_SIZE = 32;
-        
+
         // Because of the need to look before you leap (make sure one element exists)
         // this is more complicated than the JVM version:  In JVM-land, you can hasNext before you move.
 
@@ -649,7 +654,7 @@ namespace clojure.lang
                     more = _iter.MoveNext();
                 }
 
-                return new ChunkedCons(new ArrayChunk(arr, 0, n), more ?  PrimedChunkEnumeratorSeq(_iter) : null);
+                return new ChunkedCons(new ArrayChunk(arr, 0, n), more ? PrimedChunkEnumeratorSeq(_iter) : null);
             }
         }
 
@@ -946,7 +951,7 @@ namespace clojure.lang
 
         static object GetFrom(object coll, object key, object notFound)
         {
-           if (coll == null)
+            if (coll == null)
                 return notFound;
 
 
@@ -1100,7 +1105,7 @@ namespace clojure.lang
                 return str[n];
 
             if (coll.GetType().IsArray)
-                return Reflector.prepRet(coll.GetType().GetElementType(),((Array)coll).GetValue(n));
+                return Reflector.prepRet(coll.GetType().GetElementType(), ((Array)coll).GetValue(n));
 
             // Java has RandomAccess here.  CLR has no equiv.
             // Trying to replace it with IList caused some real problems,  See the fix in ASeq.
@@ -1152,7 +1157,7 @@ namespace clojure.lang
                 }
                 throw new ArgumentOutOfRangeException("n");
             }
-            
+
             throw new InvalidOperationException("nth not supported on this type: " + Util.NameForType(coll.GetType()));
         }
 
@@ -1176,7 +1181,7 @@ namespace clojure.lang
         {
             if (coll == null)
                 return notFound;
- 
+
             if (n < 0)
                 return notFound;
 
@@ -1191,7 +1196,7 @@ namespace clojure.lang
             {
                 Array a = (Array)coll;
                 if (n < a.Length)
-                    return Reflector.prepRet(a.GetType().GetElementType(),a.GetValue(n)); 
+                    return Reflector.prepRet(a.GetType().GetElementType(), a.GetValue(n));
                 return notFound;
             }
 
@@ -1413,7 +1418,7 @@ namespace clojure.lang
             if (n < Byte.MinValue || n > Byte.MaxValue)
                 throw new ArgumentException("Value out of range for byte: " + x);
 
-            return (byte)n; 
+            return (byte)n;
         }
 
 
@@ -1439,7 +1444,7 @@ namespace clojure.lang
             if (n < short.MinValue || n > short.MaxValue)
                 throw new ArgumentException("Value out of range for short: " + x);
 
-            return (short)n; 
+            return (short)n;
         }
 
 
@@ -1548,7 +1553,7 @@ namespace clojure.lang
         {
             int i = (int)x;
 
-            if ( i != x )
+            if (i != x)
                 throw new ArgumentException("Value out of range for int: " + x);
 
             return i;
@@ -1557,7 +1562,7 @@ namespace clojure.lang
 
         static public int intCast(ulong x)
         {
-            if ( x > int.MaxValue)
+            if (x > int.MaxValue)
                 throw new ArgumentException("Value out of range for int: " + x);
 
             return (int)x;
@@ -1642,9 +1647,9 @@ namespace clojure.lang
 
         static public long longCast(float x)
         {
-            if ( x < long.MinValue || x > long.MaxValue )
+            if (x < long.MinValue || x > long.MaxValue)
                 throw new ArgumentException("Value out of range for long: " + x);
-            
+
             return (long)x;
         }
 
@@ -1961,7 +1966,7 @@ namespace clojure.lang
         static public uint uncheckedUIntCast(decimal x) { return (uint)x; }
 
         #endregion
-        
+
         #region unchecked long casting
 
 
@@ -2177,7 +2182,7 @@ namespace clojure.lang
 
         static public IntPtr intPtrCast(object x)
         {
-            if(x is IntPtr ptr)
+            if (x is IntPtr ptr)
                 return ptr;
             return IntPtr.Zero;
         }
@@ -2188,7 +2193,7 @@ namespace clojure.lang
 
         static public UIntPtr uintPtrCast(object x)
         {
-            if(x is UIntPtr ptr)
+            if (x is UIntPtr ptr)
                 return ptr;
             return UIntPtr.Zero;
         }
@@ -2205,7 +2210,7 @@ namespace clojure.lang
                 return PersistentArrayMap.EMPTY;
             else if (init.Length <= PersistentArrayMap.HashtableThreshold)
                 return PersistentArrayMap.createWithCheck(init);
-            else 
+            else
                 return PersistentHashMap.createWithCheck(init);
         }
 
@@ -2234,14 +2239,14 @@ namespace clojure.lang
 
         public static IPersistentVector subvec(IPersistentVector v, int start, int end)
         {
-            if ( start < 0 )
-                throw new ArgumentOutOfRangeException("start","cannot be less than zero");
+            if (start < 0)
+                throw new ArgumentOutOfRangeException("start", "cannot be less than zero");
 
-            if (end < start )
-                throw new ArgumentOutOfRangeException("end","cannot be less than start");
+            if (end < start)
+                throw new ArgumentOutOfRangeException("end", "cannot be less than start");
 
-            if ( end > v.count())
-                throw new ArgumentOutOfRangeException("end","cannot be past the end of the vector");
+            if (end > v.count())
+                throw new ArgumentOutOfRangeException("end", "cannot be past the end of the vector");
 
             if (start == end)
                 return PersistentVector.EMPTY;
@@ -2389,7 +2394,7 @@ namespace clojure.lang
                     ret[i] = iseq.first();
                 return ret;
             }
-            
+
             throw new InvalidOperationException("Unable to convert: " + coll.GetType() + " to Object[]");
         }
 
@@ -2513,7 +2518,7 @@ namespace clojure.lang
         {
             return r is Reduced;
         }
-        
+
 
         public static bool suppressRead()
         {
@@ -2533,7 +2538,7 @@ namespace clojure.lang
 
         static public Object readString(String s)
         {
-            return readString(s,null);
+            return readString(s, null);
         }
 
 
@@ -2559,7 +2564,7 @@ namespace clojure.lang
             if (x is Obj)
             {
                 Obj o = x as Obj;
-                if (RT.count(o.meta()) > 0 && 
+                if (RT.count(o.meta()) > 0 &&
                      ((readably && booleanCast(PrintMetaVar.deref()))
                     || booleanCast(PrintDupVar.deref())))
                 {
@@ -2770,8 +2775,8 @@ namespace clojure.lang
 
         #region Locating types
 
-        static readonly char[] _triggerTypeChars = new char[] { '`', ','};
-        
+        static readonly char[] _triggerTypeChars = new char[] { '`', ',' };
+
         public static Type classForName(string p)
         {
 
@@ -2799,9 +2804,9 @@ namespace clojure.lang
             // e.g. "UnityEngine.Transform"
             foreach (Assembly assy in assys)
             {
-                  Type t1 = assy.GetType(p, false);
-                  if(t1 != null && t1.IsPublic)
-                        return t1;
+                Type t1 = assy.GetType(p, false);
+                if (t1 != null && t1.IsPublic)
+                    return t1;
             }
 
             // slow path, will succeed for display names (returned by Type.Name)
@@ -2852,7 +2857,7 @@ namespace clojure.lang
 
             return t;
         }
-        
+
 
         public static Type classForNameE(string p)
         {
@@ -2894,7 +2899,7 @@ namespace clojure.lang
         }
 
 
-      
+
         // overloads for array getters/setters
 
 
@@ -3161,7 +3166,7 @@ namespace clojure.lang
         }
 
 
-        
+
         // In core.clj, we see (cast Number x)  in a number of numeric methods.
         // There is no Number wrapper here.
         // The intent is:  if x is not a numeric value, throw a ClassCastException (Java),
@@ -3198,9 +3203,9 @@ namespace clojure.lang
 
             #region IComparer Members
 
-            public int  Compare(object x, object y)
+            public int Compare(object x, object y)
             {
- 	            return Util.ConvertToInt(_fn.invoke( x,y ));
+                return Util.ConvertToInt(_fn.invoke(x, y));
             }
 
             #endregion
@@ -3208,7 +3213,7 @@ namespace clojure.lang
 
         public static void SortArray(Array a, IFn fn)
         {
-                Array.Sort(a, new ComparerConverter(fn));
+            Array.Sort(a, new ComparerConverter(fn));
         }
 
 
@@ -3286,7 +3291,9 @@ namespace clojure.lang
             if (!RuntimeBootstrapFlag.DisableFileLoad)
             {
                 FileInfo cljInfo = sourceExtensions.Map((ext) => FindFile(relativePath + ext)).Where((fi) => !(fi is null)).FirstOrDefault();
-                FileInfo assyInfo = assemblyExtensions.Map((ext) => FindFile(relativePath + ext)).Where((fi) => !(fi is null)).FirstOrDefault();
+
+                var dllRelativePath = relativePath.Replace('/', '.');
+                FileInfo assyInfo = assemblyExtensions.Map((ext) => FindFile(dllRelativePath + ext)).Where((fi) => !(fi is null)).FirstOrDefault();
 
                 if ((assyInfo != null &&
                      (cljInfo == null || assyInfo.LastWriteTime >= cljInfo.LastWriteTime)))
@@ -3332,7 +3339,9 @@ namespace clojure.lang
             }
 
 
-            bool loaded = TryLoadFromEmbeddedResource(relativePath, relativePath + ".clj.dll");
+            bool loaded = TryLoadFromEmbeddedResource(relativePath, relativePath + ".cljr.dll")
+                || TryLoadFromEmbeddedResource(relativePath, relativePath + ".cljc.dll")
+                || TryLoadFromEmbeddedResource(relativePath, relativePath + ".clj.dll");
 
 
             if (!loaded && failIfNotFound)
