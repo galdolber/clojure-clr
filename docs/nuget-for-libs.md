@@ -5,7 +5,7 @@ We suggest what seems to be the standard project layout in Clojure libraries.  S
 
  We will put our .Net-related source in `<root>\src\main\dotnet`.
 
-(You might run into older libraries that were developed before we standardized on this approach.  They might have the clojure source directly under `<root>/src/clojure` and the .Net-related code under there also.}
+(You might run into older libraries that were developed before we standardized on this approach.  They might have the clojure source directly under `<root>/src/clojure` and the .Net-related code under there also.)
 
 The sample code below uses `clojure.tools.namespace` as the name of the library.  You should substitute appropriately.
 
@@ -69,7 +69,7 @@ In the `.csproj` file:
 		<Description>Something appropriate.</Description>
 		<Copyright>Copyright © Rich Hickey, You 202X</Copyright>
 		<PackageLicenseExpression>EPL-1.0</PackageLicenseExpression>
-		<RepositoryUrl>https://github.com/clojure/clojure.tools.namesapce</RepositoryUrl>
+		<RepositoryUrl>https://github.com/clojure/clr.tools.namesapce</RepositoryUrl>
 		<Company>ClojureCLR contributors</Company>
 		<PackageTags>Clojure;ClojureCLR</PackageTags>
 		<Version>1.1.0</Version> 

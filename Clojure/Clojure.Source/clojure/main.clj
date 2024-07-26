@@ -377,7 +377,8 @@
 by default when a new command-line REPL is started."} repl-requires
   '[[clojure.repl :refer (source apropos dir pst doc find-doc)]
     ;;;[clojure.java.javadoc :refer (javadoc)]                            ;;; commented out
-    [clojure.pprint :refer (pp pprint)]])
+    [clojure.pprint :refer (pp pprint)]
+    [clojure.repl.deps :refer (add-libs add-lib sync-deps)]])
 
 (defmacro with-read-known
   "Evaluates body with *read-eval* set to a \"known\" value,
@@ -467,24 +468,25 @@ by default when a new command-line REPL is started."} repl-requires
              (caught e)
              (set! *e e))))]
     (with-bindings
-     (try
-      (init)
-      (catch Exception e                ;;; Throwable
-        (caught e)
-        (set! *e e)))
-     (prompt)
-     (flush)
-     (loop []
-       (when-not 
-          (try (identical? (read-eval-print) request-exit)
-    (catch Exception e                 ;;; Throwable
-     (caught e)
-     (set! *e e)
-     nil))
-         (when (need-prompt)
-           (prompt)
-           (flush))
-         (recur))))))
+      (binding [*repl* true]
+       (try
+        (init)
+        (catch Exception e                ;;; Throwable
+          (caught e)
+          (set! *e e)))
+       (prompt)
+       (flush)
+       (loop []
+         (when-not 
+            (try (identical? (read-eval-print) request-exit)
+      (catch Exception e                 ;;; Throwable
+       (caught e)
+       (set! *e e)
+       nil))
+           (when (need-prompt)
+             (prompt)
+             (flush))
+           (recur)))))))
 
 (defn load-script
   "Loads Clojure source from a file or resource given its path. Paths
@@ -625,7 +627,7 @@ java -cp clojure.jar clojure.main -i init.clj script.clj args...")
                          ((requiring-resolve 'clojure.pprint/pprint) report)))
           err-path (when (= target "file")
                      (try
-                       (let [f (FileInfo. (Path/Join (Path/GetTempPath) (str "clojure-" (System.Guid/NewGuid) ".edn")))]     ;;; (.toFile (Files/createTempFile "clojure-" ".edn" (into-array FileAttribute [])))
+                       (let [f (FileInfo. (Path/Combine (Path/GetTempPath) (str "clojure-" (System.Guid/NewGuid) ".edn")))]     ;;; (.toFile (Files/createTempFile "clojure-" ".edn" (into-array FileAttribute [])))
                          (with-open [w (StreamWriter. (.OpenWrite f))]                                                                       ;;; [w (BufferedWriter. (FileWriter. f))
                            (binding [*out* w] (println report-str)))
                          (.FullName f))                                                                                      ;;; .getAbsolutePath

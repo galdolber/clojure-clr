@@ -314,6 +314,7 @@ namespace clojure.lang
         internal static readonly MethodInfo Method_Monitor_Exit = typeof(Monitor).GetMethod("Exit", new Type[] { typeof(Object) });
 
         internal static readonly MethodInfo Method_Namespace_importClass1 = typeof(Namespace).GetMethod("importClass", new Type[] { typeof(Type) });
+        internal static readonly MethodInfo Method_Namespace_importClass2 = typeof(Namespace).GetMethod("importClass", new Type[] { typeof(Symbol), typeof(Type) });
 
         internal static readonly MethodInfo Method_PersistentList_create = typeof(PersistentList).GetMethod("create", new Type[] { typeof(System.Collections.IList) });
         internal static readonly MethodInfo Method_PersistentHashSet_create = typeof(PersistentHashSet).GetMethod("create", new Type[] { typeof(Object[]) });
@@ -1566,7 +1567,7 @@ namespace clojure.lang
             LineNumberingTextReader lntr = rdr as LineNumberingTextReader ?? new LineNumberingTextReader(rdr);
 
             Var.pushThreadBindings(RT.mapUniqueKeys(
-                SourcePathVar, sourcePath,
+                SourcePathVar, relativePath,
                 SourceVar, sourceName,
                 MethodVar, null,
                 LocalEnvVar, null,
@@ -1796,7 +1797,7 @@ namespace clojure.lang
         {
             FileInfo finfo = new FileInfo(fileName);
             if (!finfo.Exists)
-                throw new FileNotFoundException("Cannot find file to load", fileName);
+                throw new FileNotFoundException($"Cannot find file to load: {fileName}", fileName);
 
             using (TextReader rdr = finfo.OpenText())
                 return load(rdr, finfo.FullName, finfo.Name, fileName);
@@ -1848,8 +1849,9 @@ namespace clojure.lang
             ConsumeWhitespaces(lntr);
 
             Var.pushThreadBindings(RT.mapUniqueKeys(
+
                 //LOADER, RT.makeClassLoader(),
-                SourcePathVar, sourcePath,
+                SourcePathVar, relativePath,
                 SourceVar, sourceName,
                 RT.ReadEvalVar, true /* RT.T */,
                 RT.CurrentNSVar, RT.CurrentNSVar.deref(),

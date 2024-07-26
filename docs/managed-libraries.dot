@@ -1,0 +1,45 @@
+strict digraph G {
+
+rankdir = RL;
+
+{
+	node [shape=box];
+
+	"clr.test.check";
+	"clr.spec.alpha" -> {"clr.test.check"};
+	"clr.core.specs.alpha" -> {"clr.spec.alpha"};
+
+	
+	"clr.core.async" -> {"tools.analyzer.clr"};
+
+	"clr.data.priority-map";
+	"clr.core.cache" -> {"clr.data.priority-map"};
+	"clr.core.memoize" -> {"clr.core.cache"}
+
+	"tools.cli*"
+	"clr.tools.gitlibs";
+	"clr.tools.deps" ->  {"clr.tools.gitlibs", "tools.cli*"};
+	"clr.tools.deps.cli" -> {"clr.tools.deps"}
+
+	"clr.tools.reader";
+	"clr.tools.namespace" -> {"clr.tools.reader"};
+
+	"clr.data.generators";
+
+	"clr.test.generative" -> {"clr.tools.namespace", "clr.data.generators"};
+	"tools.analyzer.clr" -> {"tools.analyzer*", "clr.core.memoize", "clr.tools.reader"};
+
+	"clr.cli";
+
+	"cognitect-labs/test-runner*" -> {"clr.tools.namespace", "tools.cli*"};
+
+	"tools.analyzer*";
+	"clr.tools.analyzer";
+
+	"clr.data.json";
+	"clr.core.logic";
+	"clr.tools.nrepl";
+	"clr.tools.nuget?";
+	
+}
+}

@@ -11,10 +11,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="clojure\clr\basis.cljc" />
+    <None Remove="clojure\clr\basis\impl.cljc" />
     <None Remove="clojure\clr\math.clj" />
+    <None Remove="clojure\clr\process.clj" />
+    <None Remove="clojure\repl\deps.cljc" />
+    <None Remove="clojure\tools\deps\interop.cljc" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="clojure\clr\basis.cljc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clojure\clr\basis\impl.cljc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clojure\clr\process.clj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="clojure\math.clj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -63,6 +77,9 @@
     <EmbeddedResource Include="clojure\main.clj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="clojure\repl\deps.cljc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="clojure\set.clj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -79,6 +96,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="clojure\test\tap.clj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clojure\tools\deps\interop.cljc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="clojure\uuid.clj">

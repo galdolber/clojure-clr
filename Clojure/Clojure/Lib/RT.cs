@@ -3345,7 +3345,7 @@ namespace clojure.lang
 
 
             if (!loaded && failIfNotFound)
-                throw new FileNotFoundException(String.Format("Could not locate {0} with extensions .cljr, .cljc, .cljr, .cljr.dll, .cljc.dll, or .clj.dll on load path.{1}",
+                throw new FileNotFoundException(String.Format("Could not locate {0} with extensions .cljr, .cljc, .clj, .cljr.dll, .cljc.dll, or .clj.dll on load path.{1}",
                         relativePath,
                         relativePath.Contains("_") ? " Please check that namespaces with dashes use underscores in the Clojure file name." : ""));
         }
@@ -3369,11 +3369,17 @@ namespace clojure.lang
                 }
             }
 
-            var embeddedCljName = relativePath.Replace("/", ".") + ".clj";
+
+            var embeddedCljName = relativePath.Replace("/", ".") + ".cljr";
             var stream = GetEmbeddedResourceStream(embeddedCljName, out Assembly containingAssembly);
             if ( stream == null )
             {
                 embeddedCljName = relativePath.Replace("/", ".") + ".cljc";
+                stream = GetEmbeddedResourceStream(embeddedCljName, out containingAssembly);
+            }
+            if (stream == null)
+            {
+                embeddedCljName = relativePath.Replace("/", ".") + ".clj";
                 stream = GetEmbeddedResourceStream(embeddedCljName, out containingAssembly);
             }
             if (stream != null)
@@ -3442,7 +3448,7 @@ namespace clojure.lang
 
         public static IEnumerable<string> GetFindFilePaths()
         {
-            return GetFindFilePathsRaw().Distinct();
+            return GetFindFilePathsRaw().Where(p => !String.IsNullOrEmpty(p)).Distinct();
         }
 
         static IEnumerable<string> GetFindFilePathsRaw()
@@ -3610,6 +3616,20 @@ namespace clojure.lang
                 double nextValue = BitConverter.Int64BitsToDouble(bits + 1);
                 return nextValue - absX;
             }
+        }
+
+        // I needed a way to remove empty strings/nulls from the end of an array.
+        public static string[] TrimTrailingEmptyStrings(string[] arr)
+        {
+            int i = arr.Length - 1;
+            while (i >= 0)
+            {
+                if (!String.IsNullOrEmpty(arr[i]))
+                    break;
+                i--;
+            }
+            Array.Resize(ref arr,i + 1);
+            return arr;
         }
 
         #endregion
