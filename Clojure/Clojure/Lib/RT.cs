@@ -83,6 +83,7 @@ namespace clojure.lang
             d.Add(Symbol.intern("Enum"), typeof(Enum));
             d.Add(Symbol.intern("Convert"), typeof(Convert));
             d.Add(Symbol.intern("Environment"), typeof(Environment));
+            d.Add(Symbol.intern("PlatformID"), typeof(PlatformID));
             d.Add(Symbol.intern("SByte"), typeof(SByte));
             d.Add(Symbol.intern("Type"), typeof(Type));
             d.Add(Symbol.intern("Single"), typeof(Single));
@@ -105,6 +106,8 @@ namespace clojure.lang
             d.Add(Symbol.intern("BigInteger"), typeof(clojure.lang.BigInteger));
             d.Add(Symbol.intern("BigDecimal"), typeof(clojure.lang.BigDecimal));
 
+            d.Add(Symbol.intern("NotSupportedException"), typeof(NotSupportedException));
+            
             return d;
         }
 
